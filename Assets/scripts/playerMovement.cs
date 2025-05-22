@@ -5,18 +5,24 @@ public class playerMovement : MonoBehaviour
     //Movement
     [SerializeField]private float baseSpeed =10;
     [SerializeField]private float moveSpeed =10;
-    [SerializeField]private float runSpeed =15;
     private float _moveHorizontal;
     private float _moveForward;
     private Vector3 _moveDirection;
     private Rigidbody _rb;
     
+    //Dash!!
+    [SerializeField] private Transform _target;
+    [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
+    [SerializeField] private float dashPower;
+    [SerializeField] private float dashCooldown;
+    [SerializeField] private bool dashingReady;
+    
      //jump
     [SerializeField]private KeyCode jumpKey = KeyCode.Space;
-    [SerializeField]private float jumpForce = 25f;
+    [SerializeField]private float jumpForce = 10f;
     [SerializeField]private float fallMultiplier = 2.5f;
     [SerializeField]private float groundCheckDelay = 0.3f;
-    private float _groundCheckTimer = 0f;
+    private float _groundCheckTimer;
     public float ascendMultiplier = 2f;
     private float _playerHeight;
     private float _raycastDistance;
@@ -34,9 +40,8 @@ public class playerMovement : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _rb.freezeRotation = true;
-        
         _playerHeight = GetComponent<CapsuleCollider>().height * transform.localScale.y;
-        _raycastDistance = (_playerHeight * 0.5f) + 0.2f;
+        _raycastDistance = (_playerHeight / 2f ) + 0.1f;
     }
     private void Inputs()
     {
@@ -45,7 +50,18 @@ public class playerMovement : MonoBehaviour
         
         if (Input.GetKey(jumpKey) && _isGrounded ) 
         {
-            jump();
+            Jump();
+        }
+
+        if (Input.GetKeyDown(dashKey))
+        {
+            Vector3 dashing = transform.forward * dashPower;   
+            _rb.AddForce(dashing , ForceMode.Impulse);
+        }
+
+        if (Input.GetKeyDown(dashKey))
+        {
+            Dash();
         }
     }
 
@@ -61,19 +77,11 @@ public class playerMovement : MonoBehaviour
     }
     private void GroundCheck()
     {
-        _isGrounded = Physics.Raycast(direction.position, Vector3.down, _raycastDistance, groundLayer);
+        _isGrounded = Physics.Raycast(_rb.position, Vector3.down, _raycastDistance, groundLayer);
     }
     private void MoveMe()
     {
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            moveSpeed = runSpeed;
-        }
-        else
-        {
-            moveSpeed = baseSpeed;
-        }
-        Vector3 movement = (direction.right * _moveHorizontal + direction.forward * _moveForward).normalized;
+        Vector3 movement = (direction.right * _moveHorizontal + direction.forward * _moveForward);
         Vector3 targetVelocity = movement * moveSpeed;
         
         Vector3 velocity = _rb.linearVelocity;
@@ -81,20 +89,25 @@ public class playerMovement : MonoBehaviour
         velocity.z = targetVelocity.z;
         _rb.linearVelocity = velocity;
         
-
         if (_isGrounded && _moveHorizontal == 0 && _moveForward == 0)
         {
             _rb.linearVelocity = new Vector3(0, _rb.linearVelocity.y, 0);
         }
     }
     
-    private void jump()
+    private void Jump()
     {
         _isGrounded = false;
         _groundCheckTimer = groundCheckDelay;
         _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, jumpForce, _rb.linearVelocity.z);
     }
-    
+
+    private void Dash()
+    {
+        Vector2 Dash =direction.transform.forward;
+        _rb.AddForce(Dash, ForceMode.Impulse);
+    }
+
     void Falling()
     {
         if (_rb.linearVelocity.y < 0) 
