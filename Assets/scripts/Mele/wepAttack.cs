@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class shoot : MonoBehaviour
+public class WeaponAttack : MonoBehaviour
 {
     [SerializeField] private KeyCode atkKey = KeyCode.Mouse0;
     [SerializeField] private Weapons currentWeapon;

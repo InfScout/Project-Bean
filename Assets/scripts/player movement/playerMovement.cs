@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -14,14 +15,14 @@ public class playerMovement : MonoBehaviour
      //jump
     [SerializeField]private KeyCode jumpKey = KeyCode.Space;
     [SerializeField]private float jumpForce = 10f;
-    [SerializeField]private float jumpCooldown = .25f;
+    [SerializeField]private float jumpCooldown = 1f;
     [SerializeField]private float fallMultiplier = 2.5f;
     [SerializeField]private float groundCheckDelay = 0.3f;
     private float _groundCheckTimer;
     public float ascendMultiplier = 2f;
     private float _playerHeight;
     private float _raycastDistance;
-    private bool _jumpReady;
+    private bool _jumpReady = true;
    
     [SerializeField] private Transform direction;
   
@@ -43,7 +44,7 @@ public class playerMovement : MonoBehaviour
         _moveHorizontal = Input.GetAxis("Horizontal");
         _moveForward = Input.GetAxis("Vertical");
         
-        if (Input.GetKey(jumpKey) && _isGrounded ) 
+        if (Input.GetKey(jumpKey) && _isGrounded && _jumpReady) 
         {
             Jump();
         }
@@ -84,6 +85,7 @@ public class playerMovement : MonoBehaviour
         _isGrounded = false;
         _groundCheckTimer = groundCheckDelay;
         _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, jumpForce, _rb.linearVelocity.z);
+        StartCoroutine(JumpCoolDown());
     }
     
     void Falling()
@@ -97,7 +99,12 @@ public class playerMovement : MonoBehaviour
             _rb.linearVelocity += Vector3.up * (Physics.gravity.y * ascendMultiplier * Time.fixedDeltaTime);
         }
     }
-    
-    
+
+    IEnumerator JumpCoolDown()
+    {
+        _jumpReady = false;
+        yield return new WaitForSeconds(jumpCooldown);
+        _jumpReady = true;
+    }
     
 }
