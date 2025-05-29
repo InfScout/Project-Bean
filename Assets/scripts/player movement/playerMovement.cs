@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class playerMovement : MonoBehaviour
@@ -10,16 +11,10 @@ public class playerMovement : MonoBehaviour
     private Vector3 _moveDirection;
     private Rigidbody _rb;
     
-    //Dash!!
-    [SerializeField] private Transform _target;
-    [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
-    [SerializeField] private float dashPower;
-    [SerializeField] private float dashCooldown;
-    [SerializeField] private bool dashingReady;
-    
      //jump
     [SerializeField]private KeyCode jumpKey = KeyCode.Space;
     [SerializeField]private float jumpForce = 10f;
+    [SerializeField]private float jumpCooldown = .25f;
     [SerializeField]private float fallMultiplier = 2.5f;
     [SerializeField]private float groundCheckDelay = 0.3f;
     private float _groundCheckTimer;
@@ -51,17 +46,6 @@ public class playerMovement : MonoBehaviour
         if (Input.GetKey(jumpKey) && _isGrounded ) 
         {
             Jump();
-        }
-
-        if (Input.GetKeyDown(dashKey))
-        {
-            Vector3 dashing = transform.forward * dashPower;   
-            _rb.AddForce(dashing , ForceMode.Impulse);
-        }
-
-        if (Input.GetKeyDown(dashKey))
-        {
-            Dash();
         }
     }
 
@@ -101,26 +85,19 @@ public class playerMovement : MonoBehaviour
         _groundCheckTimer = groundCheckDelay;
         _rb.linearVelocity = new Vector3(_rb.linearVelocity.x, jumpForce, _rb.linearVelocity.z);
     }
-
-    private void Dash()
-    {
-        Vector2 Dash =direction.transform.forward;
-        _rb.AddForce(Dash, ForceMode.Impulse);
-    }
-
+    
     void Falling()
     {
         if (_rb.linearVelocity.y < 0) 
         {
-            
             _rb.linearVelocity += Vector3.up * (Physics.gravity.y * fallMultiplier * Time.fixedDeltaTime);
         } 
         else if (_rb.linearVelocity.y > 0)
         {
-            
             _rb.linearVelocity += Vector3.up * (Physics.gravity.y * ascendMultiplier * Time.fixedDeltaTime);
         }
     }
     
-   
+    
+    
 }

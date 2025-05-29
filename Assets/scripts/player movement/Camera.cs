@@ -4,6 +4,7 @@ public class Camera : MonoBehaviour
 {
     [SerializeField] private float sense = 350;
     [SerializeField] private Transform target;
+    [SerializeField] private Transform playerRotate;
     private float xRotation;
     private float yRotation;
         
@@ -26,5 +27,7 @@ public class Camera : MonoBehaviour
                 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f);
         target.rotation = Quaternion.Euler(xRotation, yRotation, 0f);
+        
+        playerRotate.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
 }

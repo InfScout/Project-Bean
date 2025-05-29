@@ -11,9 +11,9 @@ TagManager:
   - Ground
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Projectile
+  - enemy
+  - Player
   - 
   - 
   - 
